@@ -1,0 +1,7 @@
+class Main{
+a = b + 1;
+mmd = true;
+(salam
+if (1==2){
+don();
+}
