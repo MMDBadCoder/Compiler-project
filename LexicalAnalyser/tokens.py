@@ -2,20 +2,20 @@ undefined_token = 'UNDEFINED_TOKEN'
 
 tokens = [
     {
-        'token': '‫‪T_BOOLEANLITERAL‬‬',
+        'token': 'T_BOOLEANLITERAL',
         'pattern': '(false|true) '
     },
     {
-        'token': '‫‪T_STRINGLITERAL',
+        'token': 'T_STRINGLITERAL',
         'pattern': '".*"'
     },
     {
-        'token': '‫‪T_INTLITERAL‬‬',
-        'pattern': '[0-9]*'
+        'token': 'T_INTEGERLITERAL',
+        'pattern': '[0-9]+'
     },
     {
         'token': 'T_CLASS',
-        'pattern': 'class '
+        'pattern': 'class'
     },
     {
         'token': 'T_IF',
@@ -26,39 +26,43 @@ tokens = [
         'pattern': 'while'
     },
     {
-        'token': '{',
+        'token': 'T_{',
         'pattern': '{'
     },
     {
-        'token': '}',
+        'token': 'T_}',
         'pattern': '}'
     },
     {
-        'token': ')',
-        'pattern': '\)'
+        'token': 'T_)',
+        'pattern': '[)]'
     },
     {
-        'token': '(',
-        'pattern': '\('
+        'token': 'T_(',
+        'pattern': '[(]'
     },
     {
-        'token': '+',
-        'pattern': '+'
+        'token': 'T_+',
+        'pattern': '\+'
     },
     {
-        'token': '-',
-        'pattern': '-'
+        'token': 'T_-',
+        'pattern': '\-'
     },
     {
-        'token': '*',
-        'pattern': '*'
+        'token': 'T_*',
+        'pattern': '\*'
     },
     {
-        'token': '/',
+        'token': 'T_/',
         'pattern': '/'
     },
     {
-        'token': '==',
+        'token': 'T_;',
+        'pattern': ';'
+    },
+    {
+        'token': 'T_==',
         'pattern': '=='
     },
     {

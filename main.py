@@ -3,7 +3,14 @@ from LexicalAnalyser.scanner import get_tokens
 
 input_file = open(input_file_address, 'r')
 content = input_file.read()
+input_file.close()
 
 tokens = get_tokens(content)
-print(tokens)
 
+out_text = ''
+for token in tokens:
+    out_text += token['matched_content'] + ' ' + token['token'] + '\n'
+
+output_file = open(output_file_address, 'w')
+output_file.write(out_text)
+output_file.close()

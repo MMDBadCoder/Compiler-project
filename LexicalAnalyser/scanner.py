@@ -11,9 +11,11 @@ def get_tokens(content):
         if new_matched_token['token'] is undefined_token:
             break
 
-        content = re.sub('^' + new_matched_token['matched_content'], '', content)
+        matched_content = new_matched_token['matched_content']
+        content = content[matched_content.__len__():]
 
     return matched_tokens
+
 
 def get_first_matched_token(content):
     from LexicalAnalyser.tokens import tokens, undefined_token
