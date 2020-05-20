@@ -6,6 +6,10 @@ def get_tokens(content):
     matched_tokens = []
     while content.__len__() > 0:
         content = remove_whitespaces_from_first(content)
+
+        if content == '':
+            break
+
         new_matched_token = get_first_matched_token(content)
         matched_tokens.append(new_matched_token)
         if new_matched_token['token'] is undefined_token:

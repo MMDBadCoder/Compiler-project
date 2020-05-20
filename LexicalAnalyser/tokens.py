@@ -201,5 +201,9 @@ tokens = [
     {
         'token': 'T_[',
         'pattern': '\['
+    },
+    {
+        'token': 'T_:',
+        'pattern': ':'
     }
 ]
