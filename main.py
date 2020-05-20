@@ -9,7 +9,10 @@ tokens = get_tokens(content)
 
 out_text = ''
 for token in tokens:
-    out_text += token['matched_content'] + ' ' + token['token'] + '\n'
+    if token['token'] == 'T_ID' or 'T_BOOLEANLITERAL' or 'T_STRINGLITERAL' or 'T_INTEGERLITERAL' or 'T_DOUBLELITERAL' or 'UNDEFINED_TOKEN':
+        out_text += token['token'] + ' ' + token['matched_content'] + '\n'
+    else :
+        out_text += token['matched_content'] + '\n'
 
 output_file = open(output_file_address, 'w')
 output_file.write(out_text)
