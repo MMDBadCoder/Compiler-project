@@ -51,5 +51,5 @@ def get_first_matched_token(content):
 
 
 def remove_whitespaces_from_first(content):
-    content = re.sub('^[\n| ]*', '', content)
+    content = re.sub('^[\n| |\t]*', '', content)
     return content

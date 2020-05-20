@@ -1,26 +1,7 @@
 undefined_token = 'UNDEFINED_TOKEN'
+comment_token = 'T_COMMENT'
 
 tokens = [
-    {
-        'token': 'T_BOOLEANLITERAL',
-        'pattern': '(false|true) '
-    },
-    {
-        'token': 'T_STRINGLITERAL',
-        'pattern': '".*"'
-    },
-    {
-        'token': 'T_INTEGERLITERAL',
-        'pattern': '\d+'
-    },
-    {
-        'token': 'T_DOUBLELITERAL',
-        'pattern': '\d+\.\d*([eE][+-]?\d+)?'
-    },
-    {
-        'token': 'T_ID',
-        'pattern': '[a-z|A-Z]{0,30}\w'
-    },
     # key words
     {
         'token': 'T_VOID',
@@ -104,6 +85,26 @@ tokens = [
     {
         'token': 'I_READLINE',
         'pattern': 'ReadLine'
+    },
+    {
+        'token': 'T_BOOLEANLITERAL',
+        'pattern': '(false|true) '
+    },
+    {
+        'token': 'T_STRINGLITERAL',
+        'pattern': '".*"'
+    },
+    {
+        'token': 'T_INTEGERLITERAL',
+        'pattern': '\d+'
+    },
+    {
+        'token': 'T_DOUBLELITERAL',
+        'pattern': '\d+\.\d*([eE][+-]?\d+)?'
+    },
+    {
+        'token': 'T_ID',
+        'pattern': '[a-z|A-Z|0-9|_]{0,30}\w'
     },
     # operands and punctuations
     {
@@ -205,5 +206,13 @@ tokens = [
     {
         'token': 'T_:',
         'pattern': ':'
+    },
+    {
+        'token': comment_token,
+        'pattern': '\/\/[^\n]*\n',
+    },
+    {
+        'token': comment_token,
+        'pattern': '\/\*((?!\*\/).)*\*\/'
     }
 ]
