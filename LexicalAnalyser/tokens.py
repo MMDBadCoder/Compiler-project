@@ -209,10 +209,10 @@ tokens = [
     },
     {
         'token': comment_token,
-        'pattern': '\/\/[^\n]*\n',
+        'pattern': '\/\/.*\n',
     },
     {
         'token': comment_token,
-        'pattern': '\/\*((?!\*\/).)*\*\/'
+        'pattern': '\/\*(.*\n*)*\*\/'
     }
 ]

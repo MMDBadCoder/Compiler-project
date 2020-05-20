@@ -8,10 +8,11 @@ input_file.close()
 tokens = get_tokens(content)
 
 out_text = ''
+shown_tokens = ['T_ID', 'T_BOOLEANLITERAL', 'T_STRINGLITERAL', 'T_INTEGERLITERAL', 'T_DOUBLELITERAL', 'UNDEFINED_TOKEN']
 for token in tokens:
-    if token['token'] == 'T_ID' or 'T_BOOLEANLITERAL' or 'T_STRINGLITERAL' or 'T_INTEGERLITERAL' or 'T_DOUBLELITERAL' or 'UNDEFINED_TOKEN':
+    if token['token'] in shown_tokens:
         out_text += token['token'] + ' ' + token['matched_content'] + '\n'
-    else :
+    else:
         out_text += token['matched_content'] + '\n'
 
 output_file = open(output_file_address, 'w')

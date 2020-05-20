@@ -1,7 +1,5 @@
-/ T_/
-* T_*
-test T_ID
-of T_ID
-comment T_ID
-* T_*
-/ T_/
+{
+void
+T_STRINGLITERAL "asdfshdfio sd fi aif a w[e jiie  iojwie ri jrjrij rrjrjriereijr ie"
+T_INTEGERLITERAL 234234
+T_INTEGERLITERAL 123412

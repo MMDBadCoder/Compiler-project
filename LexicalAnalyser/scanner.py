@@ -1,8 +1,8 @@
 import re
 
-
 def get_tokens(content):
     from LexicalAnalyser.tokens import undefined_token
+    from  LexicalAnalyser.tokens import comment_token
     matched_tokens = []
     while content.__len__() > 0:
         content = remove_whitespaces_from_first(content)
@@ -11,7 +11,8 @@ def get_tokens(content):
             break
 
         new_matched_token = get_first_matched_token(content)
-        matched_tokens.append(new_matched_token)
+        if new_matched_token['token'] is not comment_token:
+            matched_tokens.append(new_matched_token)
         if new_matched_token['token'] is undefined_token:
             break
 
@@ -51,5 +52,5 @@ def get_first_matched_token(content):
 
 
 def remove_whitespaces_from_first(content):
-    content = re.sub('^[\n| |\t]*', '', content)
+    content = re.sub('^\s*', '', content)
     return content
