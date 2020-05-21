@@ -92,7 +92,7 @@ tokens = [
     },
     {
         'token': 'T_BOOLEANLITERAL',
-        'pattern': '(false|true) '
+        'pattern': '(false|true)'
     },
     {
         'token': 'T_STRINGLITERAL',
