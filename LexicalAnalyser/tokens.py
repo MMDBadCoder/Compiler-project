@@ -104,7 +104,7 @@ tokens = [
     },
     {
         'token': 'T_ID',
-        'pattern': '[a-z|A-Z]{0,30}\w'
+        'pattern': '[a-z|A-Z]\w{0,30}'
     },
     # operands and punctuations
     {
@@ -217,6 +217,6 @@ tokens = [
     },
     {
         'token': undefined_token,
-        'pattern': '[a-z|A-Z]{31}\w'
+        'pattern': '[a-z|A-Z]\w{31}'
     }
 ]
