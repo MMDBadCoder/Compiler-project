@@ -96,7 +96,7 @@ tokens = [
     },
     {
         'token': 'T_INTEGERLITERAL',
-        'pattern': '\d+'
+        'pattern': '(0[xX](\d|[a-f|A-F])+)|\d+'
     },
     {
         'token': 'T_DOUBLELITERAL',
@@ -217,6 +217,6 @@ tokens = [
     },
     {
         'token': undefined_token,
-        'pattern': '[a-z|A-Z]{30,0}\w'
+        'pattern': '[a-z|A-Z]{31}\w'
     }
 ]
