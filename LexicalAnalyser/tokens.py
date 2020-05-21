@@ -104,7 +104,7 @@ tokens = [
     },
     {
         'token': 'T_ID',
-        'pattern': '[a-z|A-Z|0-9|_]{0,30}\w'
+        'pattern': '[a-z|A-Z]{0,30}\w'
     },
     # operands and punctuations
     {
@@ -214,5 +214,9 @@ tokens = [
     {
         'token': comment_token,
         'pattern': '\/\*(.*\n*)*\*\/'
+    },
+    {
+        'token': undefined_token,
+        'pattern': '[a-z|A-Z]{30,0}\w'
     }
 ]
