@@ -45,7 +45,7 @@ def get_first_matched_token(content):
 
     if matched is None:
         return {
-            'matched_content': content[:debug_char_length],
+            'matched_content': '',
             'token': undefined_token
         }
     return matched
