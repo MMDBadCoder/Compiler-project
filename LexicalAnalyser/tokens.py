@@ -217,6 +217,6 @@ tokens = [
     },
     {
         'token': undefined_token,
-        'pattern': '[a-z|A-Z]\w{31}'
+        'pattern': '[a-z|A-Z]\w{31,}'
     }
 ]
