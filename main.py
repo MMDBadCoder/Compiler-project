@@ -26,7 +26,7 @@ def main(argv):
     tokens = get_tokens(content)
 
     out_text = ''
-    shown_tokens = ['T_ID', 'T_BOOLEANLITERAL', 'T_STRINGLITERAL', 'T_INTEGERLITERAL', 'T_DOUBLELITERAL',
+    shown_tokens = ['T_ID', 'T_BOOLEANLITERAL', 'T_STRINGLITERAL', 'T_INTLITERAL', 'T_DOUBLELITERAL',
                     'UNDEFINED_TOKEN']
     for token in tokens:
         if token['token'] in shown_tokens:

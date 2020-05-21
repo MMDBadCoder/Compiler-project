@@ -36,6 +36,10 @@ tokens = [
         'pattern': 'null'
     },
     {
+        'token': 'T_THIS',
+        'pattern': 'this'
+    },
+    {
         'token': 'T_EXTENDS',
         'pattern': 'extends'
     },
@@ -76,7 +80,7 @@ tokens = [
     },
     {
         'token': 'I_PRINT',
-        'pattern': 'print'
+        'pattern': 'Print'
     },
     {
         'token': 'I_READINTEGER',
@@ -95,7 +99,7 @@ tokens = [
         'pattern': '".*"'
     },
     {
-        'token': 'T_INTEGERLITERAL',
+        'token': 'T_INTLITERAL',
         'pattern': '((0[xX](\d|[a-f|A-F])+)|\d+)'
     },
     {
