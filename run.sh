@@ -35,7 +35,7 @@ do
             ((NUMBER_OF_FAILED++))
             echo "---- test failed !"
         echo
-        fi
+        fi 
     else
         echo "Code did not execute successfuly!"
         ((NUMBER_OF_FAILED++))
