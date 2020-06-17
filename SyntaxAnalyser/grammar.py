@@ -20,7 +20,7 @@ grammar = '''
     return_stmt : T_RETURN T_SMALLER expr T_BIGGER T_SEMICOLON
     break_stmt : T_BREAK T_SEMICOLON
     print_stmt : T_PRINT T_PARENTHESES_OPEN expr (T_COMMA expr)* T_PARENTHESES_CLOSE T_SEMICOLON
-    expr : l_value T_EQUAL expr | j
+    expr : expr T_EQUAL expr | expr T_DOT T_ID | expr T_BRACKET_OPEN expr T_BRACKET_CLOSE | j
     j : j T_OR i | i
     i : i T_AND h | h
     h : h T_EQUAL_EQUAL g | h T_NOT_EQUAL g | g
@@ -28,12 +28,12 @@ grammar = '''
     f : f T_PLUS e | f T_MINUS e | e
     e : e T_MULT d | e T_DIVIDE d | e T_PERCENTAGE d | d
     d : T_NOT d | c
-    c : T_MINUS c | b
+    c : T_MINUS c | k
+    k : k T_DOT T_ID T_PARENTHESES_OPEN actuals T_PARENTHESES_CLOSE | b
     b : T_PARENTHESES_OPEN b T_PARENTHESES_CLOSE | a
-    a : constant | l_value | T_THIS | call | T_READINTEGER T_PARENTHESES_OPEN T_PARENTHESES_CLOSE
-    | T_READLINE T_PARENTHESES_OPEN T_PARENTHESES_CLOSE | T_NEW T_ID | T_NEWARRAY T_PARENTHESES_OPEN expr T_COMMA type T_PARENTHESES_CLOSE
-    l_value : T_ID | expr T_DOT T_ID | expr T_BRACKET_OPEN expr T_BRACKET_CLOSE
-    call : T_ID T_PARENTHESES_OPEN actuals T_PARENTHESES_CLOSE | expr T_DOT T_ID T_PARENTHESES_OPEN actuals T_PARENTHESES_CLOSE
+    a : constant | T_ID | T_THIS | call | T_READINTEGER T_PARENTHESES_OPEN T_PARENTHESES_CLOSE
+    | T_READLINE T_PARENTHESES_OPEN T_PARENTHESES_CLOSE | T_NEW T_ID
+    call : T_ID T_PARENTHESES_OPEN actuals T_PARENTHESES_CLOSE
     actuals : expr (T_COMMA expr)* |
     constant : T_INTLITERAL | T_DOUBLELITERAL | T_BOOLEANLITERAL | T_STRINGLITERAL | T_NULL
     
