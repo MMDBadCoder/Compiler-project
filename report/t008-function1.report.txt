@@ -1,0 +1,1 @@
+difference in line #1: file: out/t008-function1.out -----> content: NO <> file: tests/t008-function1.out -----> content: YES 
