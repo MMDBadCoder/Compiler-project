@@ -5,4 +5,4 @@ def parse(input):
         parser.parse(input)
     except Exception as e:
         error = True
-    return ~error
+    return not error
