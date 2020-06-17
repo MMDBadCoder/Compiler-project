@@ -14,7 +14,7 @@ def main(argv):
 	output = []
 	for opt, arg in opts:
 		if opt == '-h':
-			print ('test.py -a <firstfile> -b <secondfile> -o <reportfile>')
+			print ('mmd.py -a <firstfile> -b <secondfile> -o <reportfile>')
 			sys.exit()
 		elif opt in ("-a", "--inputa"):
 			inputfile1 = arg
