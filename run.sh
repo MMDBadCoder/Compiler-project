@@ -41,6 +41,9 @@ do
         ((NUMBER_OF_FAILED++))
     fi
 
+int main() {
+    int z;
+}
 
 
 done
