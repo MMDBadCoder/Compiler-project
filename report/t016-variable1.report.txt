@@ -1,0 +1,1 @@
+difference in line #1: file: out/t016-variable1.out -----> content: NO <> file: tests/t016-variable1.out -----> content: YES 
