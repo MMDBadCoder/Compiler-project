@@ -1,11 +1,8 @@
-regex1 = '^/\*' + '([^\*]|\*[^/])*' + '\*/$'
+from SyntaxAnalyser.parser import parse
 
-import re
-
-text = '''/* /* hellow sclsdcsdc * *
-sdc
-sdcsd
-csdc
-sdccsd sdcskdc */'''
-obj = re.search(regex1, text)
-print(obj)
+text = '''
+int main() {
+    int z;
+}
+'''
+parse(text)
