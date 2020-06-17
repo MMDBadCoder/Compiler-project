@@ -7,8 +7,8 @@ grammar = '''
     variable : type T_ID
     type: T_INT | T_BOOL | T_DOUBLE | T_STRING | T_ID | type T_BRACKET_OPEN T_BRACKET_CLOSE
     function_decl : type T_ID T_PARENTHESES_OPEN formals T_PARENTHESES_CLOSE stmt_block | T_VOID T_ID T_PARENTHESES_OPEN formals T_PARENTHESES_CLOSE stmt_block
-    formals : variable+, |
-    class_decl : T_CLASS T_ID T_SMALLER T_EXTENDS T_ID T_BIGGER T_SMALLER T_IMPLEMENTS T_ID+, T_BIGGER T_ROUND_BRACKET_OPEN field* T_ROUND_BRACKET_CLOSE
+    formals : variable (T_COMMA variable)* |
+    class_decl : T_CLASS T_ID T_SMALLER T_EXTENDS T_ID T_BIGGER T_SMALLER T_IMPLEMENTS T_ID (T_COMMA T_ID)* T_BIGGER T_ROUND_BRACKET_OPEN field* T_ROUND_BRACKET_CLOSE
     field : variable_decl | function_decl
     interface_decl : T_INTERFACE T_ID T_ROUND_BRACKET_OPEN prototype* T_ROUND_BRACKET_CLOSE
     prototype : type T_ID T_PARENTHESES_OPEN formals T_PARENTHESES_CLOSE T_SEMICOLON | T_VOID T_ID T_PARENTHESES_OPEN formals T_PARENTHESES_CLOSE T_SEMICOLON
@@ -19,7 +19,7 @@ grammar = '''
     for_stmt = T_FOR T_PARENTHESES_OPEN T_SMALLER expr T_BIGGER T_SEMICOLON T_SMALLER expr T_BIGGER T_SEMICOLON T_SMALLER expr T_BIGGER T_PARENTHESES_CLOSE stmt
     return_stmt = I_RETURN T_SMALLER expr T_BIGGER T_SEMICOLON
     break_stmt : I_BREAK T_SEMICOLON
-    print_stmt : I_PRINT T_PARENTHESES_OPEN expr+, T_PARENTHESES_CLOSE T_SEMICOLON
+    print_stmt : I_PRINT T_PARENTHESES_OPEN expr (T_COMMA expr)* T_PARENTHESES_CLOSE T_SEMICOLON
     
     expr : 
     //terminals
