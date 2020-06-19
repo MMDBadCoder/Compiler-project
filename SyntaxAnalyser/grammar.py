@@ -14,7 +14,7 @@ grammar = '''
     prototype : type T_ID T_PARENTHESES_OPEN formals T_PARENTHESES_CLOSE T_SEMICOLON | T_VOID T_ID T_PARENTHESES_OPEN formals T_PARENTHESES_CLOSE T_SEMICOLON
     stmt_block : T_ROUND_BRACKET_OPEN variable_decl* stmt* T_ROUND_BRACKET_CLOSE
     stmt : (expr)? T_SEMICOLON | i_f_stmt | while_stmt | for_stmt | break_stmt | return_stmt | print_stmt | stmt_block
-    i_f_stmt : T_IF T_ROUND_BRACKET_OPEN expr T_ROUND_BRACKET_CLOSE
+    i_f_stmt : T_IF T_ROUND_BRACKET_OPEN expr T_ROUND_BRACKET_CLOSE stmt (T_ELSE stmt)?
     while_stmt : T_WHILE T_PARENTHESES_OPEN expr T_PARENTHESES_CLOSE stmt
     for_stmt : T_FOR T_PARENTHESES_OPEN (expr)? T_SEMICOLON expr T_SEMICOLON (expr)? T_PARENTHESES_CLOSE stmt
     return_stmt : T_RETURN expr? T_SEMICOLON
@@ -93,12 +93,12 @@ grammar = '''
     T_SEMICOLON : ";"
     T_COMMA : ","
     T_DOT : "."
-    T_ROUND_BRACKET_OPEN : "{"
-    T_ROUND_BRACKET_CLOSE : "}"
-    T_PARENTHESES_CLOSE : ")"
-    T_PARENTHESES_OPEN : "("
-    T_BRACKET_CLOSE : "]"
-    T_BRACKET_OPEN : "["
+    T_ROUND_BRACKET_OPEN : /\{/
+    T_ROUND_BRACKET_CLOSE : /\}/
+    T_PARENTHESES_CLOSE : /\)/
+    T_PARENTHESES_OPEN : /\(/
+    T_BRACKET_CLOSE : /\]/
+    T_BRACKET_OPEN : /\[/
     T_COLON : ":"
 
     //ignores
