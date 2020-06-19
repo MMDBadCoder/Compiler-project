@@ -5,7 +5,7 @@ grammar = '''
     decl : variable_decl | function_decl | class_decl | interface_decl
     variable_decl : variable T_SEMICOLON
     variable : type T_ID
-    type: T_INT | T_BOOL | T_DOUBLE | T_STRING | T_ID 
+    type: T_INT | T_BOOL | T_DOUBLE | T_STRING | T_ID | type /\[\]/
     function_decl : type T_ID T_PARENTHESES_OPEN formals T_PARENTHESES_CLOSE stmt_block | T_VOID T_ID T_PARENTHESES_OPEN formals T_PARENTHESES_CLOSE stmt_block
     formals : variable (T_COMMA variable)* |
     class_decl : T_CLASS T_ID (T_EXTENDS T_ID)? (T_IMPLEMENTS T_ID (T_COMMA T_ID)*)? T_ROUND_BRACKET_OPEN field* T_ROUND_BRACKET_CLOSE
@@ -67,7 +67,7 @@ grammar = '''
     T_BOOLEANLITERAL : /(false|true)/
     T_STRINGLITERAL : /".*"/
     T_INTLITERAL : /((0[xX](\d|[a-f|A-F])+)|\d+)/
-    T_DOUBLELITERAL : /\d+\.\d*([eE][+-]?\d+)?/
+    T_DOUBLELITERAL.100 : /\d+\.\d*([eE][+-]?\d+)?/
     T_ID : /[a-z|A-Z]\w{0,30}/
 
     //comments
