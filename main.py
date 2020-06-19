@@ -23,6 +23,7 @@ def main(argv):
         result = parse(input_file)
 
     with open("out/" + outputfile, "w") as output_file:
+        print(result)
         if result is True:
             output_file.write("YES")
         else:
