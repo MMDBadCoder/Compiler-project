@@ -1,1 +1,1 @@
-difference in line #1: file: out/t006-expr2.out -----> content: NO <> file: tests/t006-expr2.out -----> content: YES 
+OK 
