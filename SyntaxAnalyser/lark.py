@@ -1,5 +1,5 @@
 from lark import Lark
 from SyntaxAnalyser.grammar import grammar
-from CodeGen.codeGeneraotor import push_ss
+from CodeGen.codeGeneraotor import CodeGen
 
-parser = Lark(grammar, parser="lalr", transformer=push_ss(), debug=True)
+parser = Lark(grammar, parser="lalr", transformer=CodeGen(), debug=True)

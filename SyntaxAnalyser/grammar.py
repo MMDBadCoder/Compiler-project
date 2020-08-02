@@ -35,7 +35,7 @@ grammar = '''
     | T_NEWARRAY T_PARENTHESES_OPEN expr T_COMMA type T_PARENTHESES_CLOSE | T_ID
     call : T_ID T_PARENTHESES_OPEN actuals T_PARENTHESES_CLOSE 
     actuals : expr (T_COMMA expr)* |
-    constant : T_INTLITERAL | T_DOUBLELITERAL | T_BOOLEANLITERAL | T_STRINGLITERAL | T_NULL
+    constant : T_INTLITERAL | T_DOUBLELITERAL | T_BOOLEANLITERAL | T_STRINGLITERAL -> push_ss| T_NULL
 
     //terminals
 
