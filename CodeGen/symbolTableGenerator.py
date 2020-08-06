@@ -206,9 +206,9 @@ def stmt_f(node):
             preFixExpression.clear()
             getInfix(value)
             getPreFix(infixExpression)
-            for i in preFixExpression:
-                print(i, end='')
-            print()
+            # for i in preFixExpression:
+            #     print(i, end='')
+            # print()
             while type(var) is not Token:
                 var = var.children[0]
             # while type(value) is not Token:
