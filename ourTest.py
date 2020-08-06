@@ -9,10 +9,10 @@ text = '''int main() {
 
     int z;
 
-    a = ReadInteger();
-    b = ReadInteger();
-    c = ReadInteger();
-    d = ReadInteger();
+    //a = ReadInteger();
+    //b = ReadInteger();
+    //c = ReadInteger();
+    //d = ReadInteger();
 
     z = a + b * c - d / a;
 
@@ -20,7 +20,7 @@ text = '''int main() {
 }'''
 
 myTree = parser.parse(text)
-print(myTree.pretty())
+# print(myTree.pretty())
 # print(myTree.data)
 # if(myTree.data == 'start'):
 #     print('yes')

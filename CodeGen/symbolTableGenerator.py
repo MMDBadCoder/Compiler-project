@@ -107,6 +107,13 @@ def variable_change(var, value):
         codeMips.append(code)
 
 
+def complex_variable_change(var, values):
+    print(var)
+    for i in values:
+        print(i, end='')
+    print()
+
+
 def print_stmt_f(node):
     for i in range(2, node.children.__len__() - 2, 2):
         temp = node.children[i]
@@ -155,11 +162,32 @@ def stmt_f(node):
         if node.children[0].children[1] == '=':
             var = node.children[0].children[0]
             value = node.children[0].children[2]
+            getValues(value)
             while type(var) is not Token:
                 var = var.children[0]
-            while type(value) is not Token:
-                value = value.children[0]
-            variable_change(var, value)
+            # while type(value) is not Token:
+            #     value = value.children[0]
+            if len(tempExpression) == 1:
+                variable_change(var, tempExpression[0])
+            else:
+                complex_variable_change(var, tempExpression)
+
+
+tempExpression = []
+
+
+def getValues(node):
+    if type(node) is not Token:
+        if len(node.children) == 1:
+            getValues(node.children[0])
+        else:
+            tempExpression.append(node.children[1])
+            for i in range(len(node.children)):
+                if i != 1:
+                    getValues(node.children[i])
+    else:
+        tempExpression.append(node)
+
 
 
 def findInSymbolTable(name):
