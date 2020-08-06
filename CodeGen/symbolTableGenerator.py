@@ -108,10 +108,49 @@ def variable_change(var, value):
 
 
 def complex_variable_change(var, values):
-    print(var)
+    typeCheck = ['T_ID', 'T_INTLITERAL', 'T_DOUBLELITERAL', 'stack']
+    ALU_stack = []
+    operandType = ''
     for i in values:
-        print(i, end='')
-    print()
+        if i.type in typeCheck:
+            if i.type == 'T_INTLITERAL':
+                operandType = 'int'
+            elif i.type == 'T_DOUBLELITERAL':
+                operandType = 'double'
+            elif i.type == 'T_ID':
+                foundSymbol = findInSymbolTable(i.value)
+                if foundSymbol.type == 'int':
+                    operandType = 'int'
+                elif foundSymbol.type == 'double':
+                    operandType = 'double'
+            break
+    ALU_stack.append(values[0])
+    ALU_stack.append(values[1])
+    i = 2
+    while len(ALU_stack) != 0:
+        if len(ALU_stack) == 1 and i == len(values):
+            break
+        elif ALU_stack[-1].type in typeCheck:
+            if ALU_stack[-2].type in typeCheck:
+                operand2 = ALU_stack.pop(-1)
+                operand1 = ALU_stack.pop(-1)
+                operator = ALU_stack.pop(-1)
+                calculateOperation(operand1, operator, operand2, operandType)
+                tempSymbol = SymbolTableItem('stack', 'lastOfStack', 0, 0)
+                ALU_stack.append(tempSymbol)
+            else:
+                ALU_stack.append(values[i])
+                i += 1
+        else:
+            ALU_stack.append(values[i])
+            i += 1
+    varSymbol = findInSymbolTable(var.value)
+    if varSymbol.type == 'int':
+        code = '''lw $t0, 0($sp)\naddi $sp, $sp, 4\nsw $t0, {}'''.format(varSymbol.id)
+        codeMips.append(code)
+    elif varSymbol.type == 'double':
+        code = '''l.s $f0, 0($sp)\naddi $sp, $sp, 4\ns.s $f0, {}'''.format(varSymbol.id)
+        codeMips.append(code)
 
 
 def print_stmt_f(node):
@@ -162,6 +201,7 @@ def stmt_f(node):
         if node.children[0].children[1] == '=':
             var = node.children[0].children[0]
             value = node.children[0].children[2]
+            tempExpression.clear()
             getValues(value)
             while type(var) is not Token:
                 var = var.children[0]
@@ -169,6 +209,8 @@ def stmt_f(node):
             #     value = value.children[0]
             if len(tempExpression) == 1:
                 variable_change(var, tempExpression[0])
+            elif tempExpression[1].value == 'ReadInteger' or tempExpression[1].value == 'ReadLine':
+                variable_change(var, tempExpression[1])
             else:
                 complex_variable_change(var, tempExpression)
 
@@ -187,6 +229,98 @@ def getValues(node):
                     getValues(node.children[i])
     else:
         tempExpression.append(node)
+
+
+def calculateOperation(operand1, operator, operand2, operandType):
+    if operand1.type == 'stack' and operand2.type == 'stack':
+        if operandType == 'int':
+            code = '''lw $a2, 0($sp)\naddi $sp, $sp, 4\nlw $a1, 0($sp)\naddi $sp, $sp, 4'''
+            codeMips.append(code)
+        elif operandType == 'double':
+            code = '''l.s $f2, 0($sp)\naddi $sp, $sp, 4\nl.s $f1, 0($sp)\naddi $sp, $sp, 4'''
+            codeMips.append(code)
+    else:
+        if operand1.type == 'T_INTLITERAL':
+            code = '''li $a1, {}'''.format(operand1.value)
+            codeMips.append(code)
+        elif operand1.type == 'T_DOUBLELITERAL':
+            dataMips.append('dbl{} : .float {}'.format(customId[0], operand1.value))
+            code = '''l.s $f1, dbl{}'''.format(customId[0])
+            codeMips.append(code)
+            customId[0] += 1
+        elif operand1.type == 'stack':
+            if operandType == 'int':
+                code = '''lw $a1, 0($sp)\naddi $sp, $sp, 4'''
+                codeMips.append(code)
+            elif operandType == 'double':
+                code = '''l.s $f1, 0($sp)\naddi $sp, $sp, 4'''
+                codeMips.append(code)
+        elif operand1.type == 'T_ID':
+            tempSymbol = findInSymbolTable(operand1.value)
+            if tempSymbol.type == 'int':
+                code = '''lw $a1, {}'''.format(tempSymbol.id)
+                codeMips.append(code)
+            elif tempSymbol.type == 'double':
+                code = '''l.s $f1, {}'''.format(tempSymbol.id)
+                codeMips.append(code)
+
+        if operand2.type == 'T_INTLITERAL':
+            code = '''li $a2, {}'''.format(operand2.value)
+            codeMips.append(code)
+        elif operand2.type == 'T_DOUBLELITERAL':
+            dataMips.append('dbl{} : .float {}'.format(customId[0], operand2.value))
+            code = '''l.s $f2, dbl{}'''.format(customId[0])
+            codeMips.append(code)
+            customId[0] += 1
+        elif operand2.type == 'stack':
+            if operandType == 'int':
+                code = '''lw $a2, 0($sp)\naddi $sp, $sp, 4'''
+                codeMips.append(code)
+            elif operandType == 'double':
+                code = '''l.s $f2, 0($sp)\naddi $sp, $sp, 4'''
+                codeMips.append(code)
+        elif operand2.type == 'T_ID':
+            tempSymbol = findInSymbolTable(operand2.value)
+            if tempSymbol.type == 'int':
+                code = '''lw $a2, {}'''.format(tempSymbol.id)
+                codeMips.append(code)
+            elif tempSymbol.type == 'double':
+                code = '''l.s $f2, {}'''.format(tempSymbol.id)
+                codeMips.append(code)
+
+    if operandType == 'int':
+        if operator.type == 'T_PLUS':
+            code = '''add $t0, $a1, $a2'''
+            codeMips.append(code)
+        elif operator.type == 'T_MINUS':
+            code = '''sub $t0, $a1, $a2'''
+            codeMips.append(code)
+        elif operator.type == 'T_MULT':
+            code = '''mul $t0, $a1, $a2'''
+            codeMips.append(code)
+        elif operator.type == 'T_DIVIDE':
+            code = '''div $t0, $a1, $a2'''
+            codeMips.append(code)
+        elif operator.type == 'T_PERCENTAGE':
+            code = '''rem $t0, $a1, $a2'''
+            codeMips.append(code)
+        code = '''subi $sp, $sp, 4\nsw $t0, 0($sp)'''
+        codeMips.append(code)
+    elif operandType == 'double':
+        if operator.type == 'T_PLUS':
+            code = '''add.s $f0, $f1, $f2'''
+            codeMips.append(code)
+        elif operator.type == 'T_MINUS':
+            code = '''sub.s $f0, $f1, $f2'''
+            codeMips.append(code)
+        elif operator.type == 'T_MULT':
+            code = '''mul.s $f0, $f1, $f2'''
+            codeMips.append(code)
+        elif operator.type == 'T_DIVIDE':
+            code = '''div.s $f0, $f1, $f2'''
+            codeMips.append(code)
+        code = '''subi $sp, $sp, 4\ns.s $f0, 0($sp)'''
+        codeMips.append(code)
 
 
 

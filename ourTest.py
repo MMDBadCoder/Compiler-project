@@ -8,11 +8,10 @@ text = '''int main() {
     int d;
 
     int z;
-
-    //a = ReadInteger();
-    //b = ReadInteger();
-    //c = ReadInteger();
-    //d = ReadInteger();
+    a = ReadInteger();
+    b = ReadInteger();
+    c = ReadInteger();
+    d = ReadInteger();
 
     z = a + b * c - d / a;
 
