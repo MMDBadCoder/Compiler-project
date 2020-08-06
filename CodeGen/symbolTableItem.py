@@ -9,7 +9,7 @@ class SymbolTableItem:
         #     self.value = ' '
         # else:
         #     self.value = None
-        self.id = 'id{}'.format(customId)
+        self.id = 'id_{}'.format(customId)
 
     def __str__(self):
         return '{}, {}, {}, {}'.format(self.type, self.name, self.value, self.id)

@@ -37,7 +37,7 @@ def variable_decl_f(node):
         symbol = SymbolTableItem(variableType, variableName, customId[0], 0)
         customId[0] += 1
         symbolTable.append(symbol)
-        dataMips.append(symbol.id + ': 0')
+        dataMips.append(symbol.id + ': .word 0')
     elif variableType == 'string':
         symbol = SymbolTableItem(variableType, variableName, customId[0], ' ')
         customId[0] += 1
@@ -192,8 +192,8 @@ def print_stmt_f(node):
             code = '''l.s $f12, dbl{}\nli $v0, 2\nsyscall'''.format(customId[0])
             codeMips.append(code)
             customId[0] += 1
-        code = '''li $v0, 4\nla $a0, newLine\nsyscall'''
-        codeMips.append(code)
+    code = '''li $v0, 4\nla $a0, newLine\nsyscall'''
+    codeMips.append(code)
 
 
 def stmt_f(node):
@@ -206,9 +206,9 @@ def stmt_f(node):
             preFixExpression.clear()
             getInfix(value)
             getPreFix(infixExpression)
-            # for i in preFixExpression:
-            #     print(i, end='')
-            # print()
+            for i in preFixExpression:
+                print(i, end='')
+            print()
             while type(var) is not Token:
                 var = var.children[0]
             # while type(value) is not Token:
@@ -374,7 +374,7 @@ def calculateOperation(operand1, operator, operand2, operandType):
         elif operator.type == 'T_PERCENTAGE':
             code = '''rem $t0, $a1, $a2'''
             codeMips.append(code)
-        code = '''subi $sp, $sp, 4\nsw $t0, 0($sp)'''
+        code = '''addi $sp, $sp, -4\nsw $t0, 0($sp)'''
         codeMips.append(code)
     elif operandType == 'double':
         if operator.type == 'T_PLUS':
@@ -389,7 +389,7 @@ def calculateOperation(operand1, operator, operand2, operandType):
         elif operator.type == 'T_DIVIDE':
             code = '''div.s $f0, $f1, $f2'''
             codeMips.append(code)
-        code = '''subi $sp, $sp, 4\ns.s $f0, 0($sp)'''
+        code = '''addi $sp, $sp, -4\ns.s $f0, 0($sp)'''
         codeMips.append(code)
 
 
