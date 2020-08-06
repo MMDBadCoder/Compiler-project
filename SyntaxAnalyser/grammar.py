@@ -64,7 +64,7 @@ grammar = '''
     T_READLINE : "ReadLine"
 
     //literals
-    T_BOOLEANLITERAL : /(false|true)/
+    T_BOOLEANLITERAL.100 : /(false|true)/
     T_STRINGLITERAL : /".*"/
     T_INTLITERAL : /((0[xX](\d|[a-f|A-F])+)|\d+)/
     T_DOUBLELITERAL.100 : /\d+\.\d*([eE][+-]?\d+)?/
