@@ -205,10 +205,13 @@ def stmt_f(node):
             postFixExpression.clear()
             preFixExpression.clear()
             getInfix(value)
+            # for i in infixExpression:
+            #     print(i, end='')
+            # print()
             getPreFix(infixExpression)
-            for i in preFixExpression:
-                print(i, end='')
-            print()
+            # for i in preFixExpression:
+            #     print(i, end='')
+            # print()
             while type(var) is not Token:
                 var = var.children[0]
             # while type(value) is not Token:
@@ -252,36 +255,55 @@ def getPostFix(array):
             tempStack.pop(-1)
         elif i in operators:
             if i == '+':
-                tempStack.append(i)
+                if len(tempStack) == 0:
+                    tempStack.append(i)
+                elif tempStack[-1] not in operators:
+                    tempStack.append(i)
+                else:
+                    while len(tempStack) != 0 and tempStack[-1] != '(' and tempStack[-1] != ')':
+                        postFixExpression.append(tempStack[-1])
+                        tempStack.pop(-1)
+                    tempStack.append(i)
             elif i == '-':
-                tempStack.append(i)
+                if len(tempStack) == 0:
+                    tempStack.append(i)
+                elif tempStack[-1] not in operators:
+                    tempStack.append(i)
+                else:
+                    while len(tempStack) != 0 and tempStack[-1] != '(' and tempStack[-1] != ')':
+                        postFixExpression.append(tempStack[-1])
+                        tempStack.pop(-1)
+                    tempStack.append(i)
             elif i == '*':
                 if len(tempStack) == 0:
                     tempStack.append(i)
-                elif tempStack not in operators or tempStack[-1] == '+' or tempStack[-1] == '-':
+                elif tempStack[-1] not in operators or tempStack[-1] == '+' or tempStack[-1] == '-':
                     tempStack.append(i)
                 else:
-                    while tempStack[-1] != '(' and tempStack[-1] != ')' and tempStack[-1] != '+' and tempStack[-1] != '-':
+                    while len(tempStack) != 0 and tempStack[-1] != '(' and tempStack[-1] != ')' and tempStack[-1] != '+' and tempStack[-1] != '-':
                         postFixExpression.append(tempStack[-1])
                         tempStack.pop(-1)
+                    tempStack.append(i)
             elif i == '/':
                 if len(tempStack) == 0:
                     tempStack.append(i)
-                elif tempStack not in operators or tempStack[-1] == '+' or tempStack[-1] == '-':
+                elif tempStack[-1] not in operators or tempStack[-1] == '+' or tempStack[-1] == '-':
                     tempStack.append(i)
                 else:
-                    while tempStack[-1] != '(' and tempStack[-1] != ')' and tempStack[-1] != '+' and tempStack[-1] != '-':
+                    while len(tempStack) != 0 and tempStack[-1] != '(' and tempStack[-1] != ')' and tempStack[-1] != '+' and tempStack[-1] != '-':
                         postFixExpression.append(tempStack[-1])
                         tempStack.pop(-1)
+                    tempStack.append(i)
             elif i == '%':
                 if len(tempStack) == 0:
                     tempStack.append(i)
-                elif tempStack not in operators or tempStack[-1] == '+' or tempStack[-1] == '-':
+                elif tempStack[-1] not in operators or tempStack[-1] == '+' or tempStack[-1] == '-':
                     tempStack.append(i)
                 else:
-                    while tempStack[-1] != '(' and tempStack[-1] != ')' and tempStack[-1] != '+' and tempStack[-1] != '-':
+                    while len(tempStack) != 0 and tempStack[-1] != '(' and tempStack[-1] != ')' and tempStack[-1] != '+' and tempStack[-1] != '-':
                         postFixExpression.append(tempStack[-1])
                         tempStack.pop(-1)
+                    tempStack.append(i)
     while len(tempStack) != 0:
         postFixExpression.append(tempStack[-1])
         tempStack.pop(-1)
@@ -296,6 +318,9 @@ def getPreFix(array):
             temp.append('(')
         else:
             temp.append(array[i])
+    # for i in temp:
+    #     print(i, end='')
+    # print()
     getPostFix(temp)
     for i in range(len(postFixExpression) - 1, -1, -1):
         preFixExpression.append(postFixExpression[i])
