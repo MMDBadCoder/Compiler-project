@@ -201,34 +201,104 @@ def stmt_f(node):
         if node.children[0].children[1] == '=':
             var = node.children[0].children[0]
             value = node.children[0].children[2]
-            tempExpression.clear()
-            getValues(value)
+            infixExpression.clear()
+            postFixExpression.clear()
+            preFixExpression.clear()
+            getInfix(value)
+            getPreFix(infixExpression)
+            for i in preFixExpression:
+                print(i, end='')
+            print()
             while type(var) is not Token:
                 var = var.children[0]
             # while type(value) is not Token:
             #     value = value.children[0]
-            if len(tempExpression) == 1:
-                variable_change(var, tempExpression[0])
-            elif tempExpression[1].value == 'ReadInteger' or tempExpression[1].value == 'ReadLine':
-                variable_change(var, tempExpression[1])
+            if len(preFixExpression) == 1:
+                variable_change(var, preFixExpression[0])
+            elif preFixExpression[1].value == 'ReadInteger' or preFixExpression[1].value == 'ReadLine':
+                variable_change(var, preFixExpression[1])
             else:
-                complex_variable_change(var, tempExpression)
+                complex_variable_change(var, preFixExpression)
 
 
-tempExpression = []
+infixExpression = []
+postFixExpression = []
+preFixExpression = []
 
 
-def getValues(node):
+def getInfix(node):
     if type(node) is not Token:
         if len(node.children) == 1:
-            getValues(node.children[0])
+            getInfix(node.children[0])
         else:
-            tempExpression.append(node.children[1])
             for i in range(len(node.children)):
-                if i != 1:
-                    getValues(node.children[i])
+                getInfix(node.children[i])
     else:
-        tempExpression.append(node)
+        infixExpression.append(node)
+
+
+def getPostFix(array):
+    operators = ['+', '-', '*', '/', '%']
+    tempStack = []
+    for i in array:
+        if i not in operators and i != '(' and i != ')':
+            postFixExpression.append(i)
+        elif i == '(':
+            tempStack.append(i)
+        elif i == ')':
+            while tempStack[-1] != '(':
+                postFixExpression.append(tempStack[-1])
+                tempStack.pop(-1)
+            tempStack.pop(-1)
+        elif i in operators:
+            if i == '+':
+                tempStack.append(i)
+            elif i == '-':
+                tempStack.append(i)
+            elif i == '*':
+                if len(tempStack) == 0:
+                    tempStack.append(i)
+                elif tempStack not in operators or tempStack[-1] == '+' or tempStack[-1] == '-':
+                    tempStack.append(i)
+                else:
+                    while tempStack[-1] != '(' and tempStack[-1] != ')' and tempStack[-1] != '+' and tempStack[-1] != '-':
+                        postFixExpression.append(tempStack[-1])
+                        tempStack.pop(-1)
+            elif i == '/':
+                if len(tempStack) == 0:
+                    tempStack.append(i)
+                elif tempStack not in operators or tempStack[-1] == '+' or tempStack[-1] == '-':
+                    tempStack.append(i)
+                else:
+                    while tempStack[-1] != '(' and tempStack[-1] != ')' and tempStack[-1] != '+' and tempStack[-1] != '-':
+                        postFixExpression.append(tempStack[-1])
+                        tempStack.pop(-1)
+            elif i == '%':
+                if len(tempStack) == 0:
+                    tempStack.append(i)
+                elif tempStack not in operators or tempStack[-1] == '+' or tempStack[-1] == '-':
+                    tempStack.append(i)
+                else:
+                    while tempStack[-1] != '(' and tempStack[-1] != ')' and tempStack[-1] != '+' and tempStack[-1] != '-':
+                        postFixExpression.append(tempStack[-1])
+                        tempStack.pop(-1)
+    while len(tempStack) != 0:
+        postFixExpression.append(tempStack[-1])
+        tempStack.pop(-1)
+
+
+def getPreFix(array):
+    temp = []
+    for i in range(len(array) - 1, -1, -1):
+        if array[i] == '(':
+            temp.append(')')
+        elif array[i] == ')':
+            temp.append('(')
+        else:
+            temp.append(array[i])
+    getPostFix(temp)
+    for i in range(len(postFixExpression) - 1, -1, -1):
+        preFixExpression.append(postFixExpression[i])
 
 
 def calculateOperation(operand1, operator, operand2, operandType):
