@@ -2,17 +2,14 @@ from SyntaxAnalyser.lark import parser
 from CodeGen.symbolTableGenerator import dfs, dataMips, codeMips, symbolTable
 
 text = '''int main() {
-    string s;
-    double t;
-    bool bb;
-    int x;
-    int z;
-    s = "ddfdfdfdf";
-    bb = true;
-    x = 88;
-    z = x;
-    t = 5.5;
-    Print(x, s, 23, true, bb);
+    int a;
+    int b;
+
+    a = ReadInteger();
+    b = ReadInteger();
+
+    Print(a);
+    Print(b);
 }
 '''
 
@@ -22,6 +19,9 @@ myTree = parser.parse(text)
 # if(myTree.data == 'start'):
 #     print('yes')
 dfs(myTree, myTree)
+dataMips.append('true: .asciiz "true"')
+dataMips.append('false: .asciiz "false"')
+dataMips.append('newLine: .asciiz "\\n"')
 for i in dataMips:
     print(i)
 for i in codeMips:

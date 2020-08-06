@@ -5,7 +5,7 @@ symbolTable = []
 # scopes are separated by !!!
 customId = [0]
 registerId = [0]
-dataMips = ['.data', 'true : .asciiz "true"', 'false : .asciiz "false"']
+dataMips = ['.data']
 codeMips = ['''.text\nmain:''']
 
 
@@ -89,6 +89,11 @@ def variable_change(var, value):
         code = '''l.s $f12, dbl{}\ns.s $f12, {}'''.format(customId[0], foundSymbol.id)
         codeMips.append(code)
         customId[0] += 1
+    elif value.type == 'T_READINTEGER':
+        foundSymbol = findInSymbolTable(var.value)
+        foundSymbol.value = value.value
+        code = '''li $v0, 5\nsyscall\nsw $v0, {}'''.format(foundSymbol.id)
+        codeMips.append(code)
 
 
 def print_stmt_f(node):
@@ -130,6 +135,8 @@ def print_stmt_f(node):
             code = '''l.s $f12, dbl{}\nli $v0, 2\nsyscall'''.format(customId[0])
             codeMips.append(code)
             customId[0] += 1
+        code = '''li $v0, 4\nla $a0, newLine\nsyscall'''
+        codeMips.append(code)
 
 
 def stmt_f(node):
