@@ -5,16 +5,19 @@ symbolTable = []
 # scopes are separated by !!!
 customId = [0]
 registerId = [0]
-dataMips = ['.data', 'true : .asciiz "true"', 'false : .asciiz "false"']
+dataMips = ['.data']
 codeMips = ['''.text\nmain:''']
-
+constantsOfData = ['true: .asciiz "true"', 'false: .asciiz "false"', 'newLine: .asciiz "\\n"']
 
 def dfs(tree, node):
+    flag = False
     if type(node) is not Token:
         if node.data == 'variable_decl':
             variable_decl_f(node)
+            flag = True
         elif node.data == 'print_stmt':
             print_stmt_f(node)
+            flag = True
         elif node.data == 'stmt':
             stmt_f(node)
     else:
@@ -22,7 +25,7 @@ def dfs(tree, node):
             symbolTable.append('!!!')
         if node == '}':
             cleanScope()
-    if type(node) is not Token:
+    if type(node) is not Token and not flag:
         for i in range(node.children.__len__()):
             dfs(tree, node.children[i])
 
@@ -89,6 +92,19 @@ def variable_change(var, value):
         code = '''l.s $f12, dbl{}\ns.s $f12, {}'''.format(customId[0], foundSymbol.id)
         codeMips.append(code)
         customId[0] += 1
+    elif value.type == 'T_READINTEGER':
+        foundSymbol = findInSymbolTable(var.value)
+        foundSymbol.value = value.value
+        code = '''li $v0, 5\nsyscall\nsw $v0, {}'''.format(foundSymbol.id)
+        codeMips.append(code)
+    elif value.type == 'T_READLINE':
+        dataMips.append('buffer{}: .space 100'.format(customId[0]))
+        code = '''li $v0, 8\nla $a0, buffer{}\nli $a1, 100\nsyscall'''.format(customId[0])
+        tempSymbol = SymbolTableItem('string', var.value, customId[0],' ')
+        tempSymbol.id = 'buffer' + customId[0].__str__()
+        symbolTable.append(tempSymbol)
+        customId[0] += 1
+        codeMips.append(code)
 
 
 def print_stmt_f(node):
@@ -130,12 +146,14 @@ def print_stmt_f(node):
             code = '''l.s $f12, dbl{}\nli $v0, 2\nsyscall'''.format(customId[0])
             codeMips.append(code)
             customId[0] += 1
+        code = '''li $v0, 4\nla $a0, newLine\nsyscall'''
+        codeMips.append(code)
 
 
 def stmt_f(node):
     if node.children[0].data == 'expr':
         if node.children[0].children[1] == '=':
-            var = node.children[0]
+            var = node.children[0].children[0]
             value = node.children[0].children[2]
             while type(var) is not Token:
                 var = var.children[0]

@@ -1,27 +1,31 @@
 from SyntaxAnalyser.lark import parser
-from CodeGen.symbolTableGenerator import dfs, dataMips, codeMips, symbolTable
+from CodeGen.symbolTableGenerator import dfs, dataMips, codeMips, symbolTable, constantsOfData
 
 text = '''int main() {
-    string s;
-    double t;
-    bool bb;
-    int x;
+    int a;
+    int b;
+    int c;
+    int d;
+
     int z;
-    s = "ddfdfdfdf";
-    bb = true;
-    x = 88;
-    z = x;
-    t = 5.5;
-    Print(x, s, 23, true, bb);
-}
-'''
+
+    a = ReadInteger();
+    b = ReadInteger();
+    c = ReadInteger();
+    d = ReadInteger();
+
+    z = a + b * c - d / a;
+
+    Print(z);
+}'''
 
 myTree = parser.parse(text)
-# print(myTree.pretty())
+print(myTree.pretty())
 # print(myTree.data)
 # if(myTree.data == 'start'):
 #     print('yes')
 dfs(myTree, myTree)
+dataMips = dataMips + constantsOfData
 for i in dataMips:
     print(i)
 for i in codeMips:
