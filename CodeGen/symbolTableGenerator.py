@@ -169,7 +169,6 @@ def print_stmt_f(node):
             temp = temp.children[0]
         # print(temp.type)
         if type(temp) is Token:
-            print(temp)
             if temp.type == 'T_ID':
                 foundSymbol = findInSymbolTable(temp.value)
                 if foundSymbol.type == 'int':
