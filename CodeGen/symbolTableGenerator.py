@@ -109,8 +109,10 @@ def variable_change(var, value):
 
 def complex_variable_change(var, values):
     typeCheck = ['T_ID', 'T_INTLITERAL', 'T_DOUBLELITERAL', 'stack']
+    operatorTypes = ['T_PLUS', 'T_MINUS', 'T_MULT', 'T_DIVIDE', 'T_PERCENTAGE']
     ALU_stack = []
     operandType = ''
+    # print(values)
     for i in values:
         if i.type in typeCheck:
             if i.type == 'T_INTLITERAL':
@@ -132,9 +134,10 @@ def complex_variable_change(var, values):
             break
         elif ALU_stack[-1].type in typeCheck:
             if ALU_stack[-2].type in typeCheck:
-                operand2 = ALU_stack.pop(-1)
                 operand1 = ALU_stack.pop(-1)
+                operand2 = ALU_stack.pop(-1)
                 operator = ALU_stack.pop(-1)
+                # print(operand1, operator, operand2)
                 calculateOperation(operand1, operator, operand2, operandType)
                 tempSymbol = SymbolTableItem('stack', 'lastOfStack', 0, 0)
                 ALU_stack.append(tempSymbol)
@@ -208,20 +211,26 @@ def stmt_f(node):
             # for i in infixExpression:
             #     print(i, end='')
             # print()
-            getPreFix(infixExpression)
-            # for i in preFixExpression:
+            getPostFix(infixExpression)
+            # for i in postFixExpression:
+            #     print(i, end='')
+            # print()
+            desiredValues = []
+            for i in range(len(postFixExpression) - 1, -1, -1):
+                desiredValues.append(postFixExpression[i])
+            # for i in desiredValues:
             #     print(i, end='')
             # print()
             while type(var) is not Token:
                 var = var.children[0]
             # while type(value) is not Token:
             #     value = value.children[0]
-            if len(preFixExpression) == 1:
-                variable_change(var, preFixExpression[0])
-            elif preFixExpression[1].value == 'ReadInteger' or preFixExpression[1].value == 'ReadLine':
-                variable_change(var, preFixExpression[1])
+            if len(postFixExpression) == 1:
+                variable_change(var, postFixExpression[0])
+            elif postFixExpression[1].value == 'ReadInteger' or postFixExpression[1].value == 'ReadLine':
+                variable_change(var, postFixExpression[1])
             else:
-                complex_variable_change(var, preFixExpression)
+                complex_variable_change(var, desiredValues)
 
 
 infixExpression = []
@@ -244,6 +253,9 @@ def getPostFix(array):
     operators = ['+', '-', '*', '/', '%']
     tempStack = []
     for i in array:
+        # print('********')
+        # print(tempStack)
+        # print(postFixExpression)
         if i not in operators and i != '(' and i != ')':
             postFixExpression.append(i)
         elif i == '(':
@@ -329,10 +341,10 @@ def getPreFix(array):
 def calculateOperation(operand1, operator, operand2, operandType):
     if operand1.type == 'stack' and operand2.type == 'stack':
         if operandType == 'int':
-            code = '''lw $a2, 0($sp)\naddi $sp, $sp, 4\nlw $a1, 0($sp)\naddi $sp, $sp, 4'''
+            code = '''lw $a1, 0($sp)\naddi $sp, $sp, 4\nlw $a2, 0($sp)\naddi $sp, $sp, 4'''
             codeMips.append(code)
         elif operandType == 'double':
-            code = '''l.s $f2, 0($sp)\naddi $sp, $sp, 4\nl.s $f1, 0($sp)\naddi $sp, $sp, 4'''
+            code = '''l.s $f1, 0($sp)\naddi $sp, $sp, 4\nl.s $f2, 0($sp)\naddi $sp, $sp, 4'''
             codeMips.append(code)
     else:
         if operand1.type == 'T_INTLITERAL':
