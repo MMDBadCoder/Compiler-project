@@ -5,9 +5,13 @@ symbolTable = []
 # scopes are separated by !!!
 customId = [0]
 registerId = [0]
+macroDataMips = []
+macroTextMips = []
+allMacros = {}
 dataMips = ['.data']
 codeMips = ['''.text\nmain:''']
 constantsOfData = ['true: .asciiz "true"', 'false: .asciiz "false"', 'newLine: .asciiz "\\n"']
+
 
 def dfs(tree, node):
     flag = False
@@ -20,14 +24,17 @@ def dfs(tree, node):
             flag = True
         elif node.data == 'stmt':
             stmt_f(node)
+        elif node.data == 'function_decl':
+            function_decl_f(node)
+        if not flag:
+            for i in range(node.children.__len__()):
+                dfs(tree, node.children[i])
     else:
         if node == '{':
             symbolTable.append('!!!')
         if node == '}':
             cleanScope()
-    if type(node) is not Token and not flag:
-        for i in range(node.children.__len__()):
-            dfs(tree, node.children[i])
+
 
 
 def variable_decl_f(node):
@@ -109,7 +116,6 @@ def variable_change(var, value):
 
 def complex_variable_change(var, values):
     typeCheck = ['T_ID', 'T_INTLITERAL', 'T_DOUBLELITERAL', 'stack']
-    operatorTypes = ['T_PLUS', 'T_MINUS', 'T_MULT', 'T_DIVIDE', 'T_PERCENTAGE']
     ALU_stack = []
     operandType = ''
     # print(values)
@@ -159,42 +165,58 @@ def complex_variable_change(var, values):
 def print_stmt_f(node):
     for i in range(2, node.children.__len__() - 2, 2):
         temp = node.children[i]
-        while type(temp) is not Token:
+        while type(temp) is not Token and temp.data != 'call':
             temp = temp.children[0]
-        # print(temp)
         # print(temp.type)
-        if temp.type == 'T_ID':
-            foundSymbol = findInSymbolTable(temp.value)
-            if foundSymbol.type == 'int':
-                code = '''li $v0, 1\nlw $a0, {}\nsyscall'''.format(foundSymbol.id)
+        if type(temp) is Token:
+            if temp.type == 'T_ID':
+                foundSymbol = findInSymbolTable(temp.value)
+                if foundSymbol.type == 'int':
+                    code = '''li $v0, 1\nlw $a0, {}\nsyscall'''.format(foundSymbol.id)
+                    codeMips.append(code)
+                elif foundSymbol.type == 'string':
+                    code = '''li $v0, 4\nla $a0, {}\nsyscall'''.format(foundSymbol.id)
+                    codeMips.append(code)
+                elif foundSymbol.type == 'bool':
+                    code = '''li $v0, 4\nlw $t0, {}\nbeq $zero , $t0, label{}\nla $a0, true\nj label{}\nlabel{}:\nla $a0, false\nlabel{}:\nsyscall'''.format(
+                        foundSymbol.id, customId[0], customId[0] + 1, customId[0], customId[0] + 1)
+                    codeMips.append(code)
+                    customId[0] += 2
+                elif foundSymbol.type == 'double':
+                    code = '''l.s $f12, {}\nli $v0, 2\nsyscall'''.format(foundSymbol.id)
+                    codeMips.append(code)
+            elif temp.type == 'T_INTLITERAL':
+                code = '''li $v0, 1\nli $a0, {}\nsyscall'''.format(temp.value)
                 codeMips.append(code)
-            elif foundSymbol.type == 'string':
-                code = '''li $v0, 4\nla $a0, {}\nsyscall'''.format(foundSymbol.id)
+            elif temp.type == 'T_BOOLEANLITERAL':
+                code = '''li $v0, 4\nla $a0, {}\nsyscall'''.format(temp.value)
                 codeMips.append(code)
-            elif foundSymbol.type == 'bool':
-                code = '''li $v0, 4\nlw $t0, {}\nbeq $zero , $t0, label{}\nla $a0, true\nj label{}\nlabel{}:\nla $a0, false\nlabel{}:\nsyscall'''.format(
-                    foundSymbol.id, customId[0], customId[0] + 1, customId[0], customId[0] + 1)
+            elif temp.type == 'T_STRINGLITERAL':
+                dataMips.append('str{} : .asciiz {}'.format(customId[0], temp.value))
+                code = '''li $v0, 4\nla $a0, str{}\nsyscall'''.format(customId[0])
                 codeMips.append(code)
-                customId[0] += 2
-            elif foundSymbol.type == 'double':
-                code = '''l.s $f12, {}\nli $v0, 2\nsyscall'''.format(foundSymbol.id)
+                customId[0] += 1
+            elif temp.type == 'T_DOUBLELITERAL':
+                dataMips.append('dbl{} : .float {}'.format(customId[0], temp.value))
+                code = '''l.s $f12, dbl{}\nli $v0, 2\nsyscall'''.format(customId[0])
                 codeMips.append(code)
-        elif temp.type == 'T_INTLITERAL':
-            code = '''li $v0, 1\nli $a0, {}\nsyscall'''.format(temp.value)
+                customId[0] += 1
+        else:
+            tempFormals = []
+            listOfFunctionFormals.clear()
+            getFormals(temp.children[2])
+            for i in listOfFunctionFormals:
+                if i.value != ',':
+                    tempFormals.append(i)
+            macroInputs = ''
+            for i in tempFormals:
+                foundSymbol = findInSymbolTable(i.value)
+                # print(foundSymbol)
+                macroInputs += '{}, '.format(foundSymbol.id)
+            code = '''{} ({})'''.format(temp.children[0], macroInputs)
             codeMips.append(code)
-        elif temp.type == 'T_BOOLEANLITERAL':
-            code = '''li $v0, 4\nla $a0, {}\nsyscall'''.format(temp.value)
+            code = '''li $v0, 1\nlw $a0, 0($sp)\naddi $sp, $sp, 4\nsyscall'''
             codeMips.append(code)
-        elif temp.type == 'T_STRINGLITERAL':
-            dataMips.append('str{} : .asciiz {}'.format(customId[0], temp.value))
-            code = '''li $v0, 4\nla $a0, str{}\nsyscall'''.format(customId[0])
-            codeMips.append(code)
-            customId[0] += 1
-        elif temp.type == 'T_DOUBLELITERAL':
-            dataMips.append('dbl{} : .float {}'.format(customId[0], temp.value))
-            code = '''l.s $f12, dbl{}\nli $v0, 2\nsyscall'''.format(customId[0])
-            codeMips.append(code)
-            customId[0] += 1
     code = '''li $v0, 4\nla $a0, newLine\nsyscall'''
     codeMips.append(code)
 
@@ -231,6 +253,97 @@ def stmt_f(node):
                 variable_change(var, postFixExpression[1])
             else:
                 complex_variable_change(var, desiredValues)
+
+
+def function_decl_f(node):
+    if node.children[1].value != 'main':
+        formalsString = ''
+        getFormals(node.children[3])
+        for i in listOfFunctionFormals:
+            if i.type == 'T_ID':
+                formalsString += '%{}, '.format(i.value)
+        macroDataMips.append('.macro {} ('.format(node.children[1].value) + formalsString + ')')
+        macroDataMips.append('.data')
+        for i in range(len(listOfFunctionFormals)):
+            if listOfFunctionFormals[i].type == 'T_ID':
+                # if listOfFunctionFormals[i - 1].type == 'T_INT':
+                #     macroDataMips.append('{}: .word %{}'.format(listOfFunctionFormals[i].value, listOfFunctionFormals[i].value))
+                # elif listOfFunctionFormals[i - 1].type == 'T_BOOL':
+                #     macroDataMips.append('{}: .word %{}'.format(listOfFunctionFormals[i].value, listOfFunctionFormals[i].value))
+                # elif listOfFunctionFormals[i - 1].type == 'T_DOUBLE':
+                #     macroDataMips.append('{}: .float %{}'.format(listOfFunctionFormals[i].value, listOfFunctionFormals[i].value))
+                if listOfFunctionFormals[i - 1].type == 'T_STRING':
+                    macroDataMips.append('{}: .asciiz %{}'.format(listOfFunctionFormals[i].value, listOfFunctionFormals[i].value))
+        macroTextMips.append('.text')
+        getFunctionStmtBlock(node.children[-1], listOfFunctionFormals)
+        macroTextMips.append('.end_macro')
+        allMacros[node.children[1].value] = []
+        for i in macroDataMips:
+            allMacros[node.children[1].value].append(i)
+        for i in macroTextMips:
+            allMacros[node.children[1].value].append(i)
+
+
+listOfFunctionFormals = []
+
+
+def getFormals(node):
+    if type(node) is Token:
+        listOfFunctionFormals.append(node)
+    else:
+        if len(node.children) == 1:
+            getFormals(node.children[0])
+        else:
+            for i in range(len(node.children)):
+                getFormals(node.children[i])
+
+
+def getFunctionStmtBlock(node, formals):
+    if type(node) is not Token:
+        if node.data == 'stmt':
+            if node.children[0].data == 'return_stmt':
+                getFunctionReturnStmt(node, formals)
+            else:
+                pass
+        if len(node.children) == 1:
+            getFunctionStmtBlock(node.children[0], formals)
+        else:
+            for i in range(len(node.children)):
+                getFunctionStmtBlock(node.children[i], formals)
+
+
+def getFunctionReturnStmt(node, formals):
+    typeCheck = ['T_ID', 'T_INTLITERAL', 'T_DOUBLELITERAL', 'stack']
+    operatorTypes = ['T_PLUS', 'T_MINUS', 'T_MULT', 'T_DIVIDE', 'T_PERCENTAGE']
+    getInfix(node.children[0].children[1])
+    getPostFix(infixExpression)
+    tempStack = []
+    operandType = ''
+    for i in postFixExpression:
+        if i.type in typeCheck:
+            if i.type == 'T_INTLITERAL':
+                operandType = 'int'
+            elif i.type == 'T_DOUBLELITERAL':
+                operandType = 'double'
+            elif i.type == 'T_ID':
+                for j in range(len(formals)):
+                    if formals[j].value == i.value:
+                        operandType = formals[j - 1].value
+            break
+    for i in postFixExpression:
+        if i.type in operatorTypes:
+            operand2 = tempStack.pop(-1)
+            operand1 = tempStack.pop(-1)
+            operator = i
+            tempSymbol = SymbolTableItem('stack', 'lastOfStack', 0, 0)
+            calculateMacroOperation(operand1, operator, operand2, operandType)
+            tempStack.append(tempSymbol)
+        else:
+            tempStack.append(i)
+
+
+def getFunctionStmt(node):
+    pass
 
 
 infixExpression = []
@@ -428,6 +541,96 @@ def calculateOperation(operand1, operator, operand2, operandType):
             codeMips.append(code)
         code = '''addi $sp, $sp, -4\ns.s $f0, 0($sp)'''
         codeMips.append(code)
+
+
+def calculateMacroOperation(operand1, operator, operand2, operandType):
+    if operand1.type == 'stack' and operand2.type == 'stack':
+        if operandType == 'int':
+            code = '''lw $a2, 0($sp)\naddi $sp, $sp, 4\nlw $a1, 0($sp)\naddi $sp, $sp, 4'''
+            macroTextMips.append(code)
+        elif operandType == 'double':
+            code = '''l.s $f2, 0($sp)\naddi $sp, $sp, 4\nl.s $f1, 0($sp)\naddi $sp, $sp, 4'''
+            macroTextMips.append(code)
+    else:
+        if operand1.type == 'T_INTLITERAL':
+            code = '''li $a1, {}'''.format(operand1.value)
+            macroTextMips.append(code)
+        elif operand1.type == 'T_DOUBLELITERAL':
+            macroDataMips.append('dbl{} : .float {}'.format(customId[0], operand1.value))
+            code = '''l.s $f1, dbl{}'''.format(customId[0])
+            macroTextMips.append(code)
+            customId[0] += 1
+        elif operand1.type == 'stack':
+            if operandType == 'int':
+                code = '''lw $a1, 0($sp)\naddi $sp, $sp, 4'''
+                macroTextMips.append(code)
+            elif operandType == 'double':
+                code = '''l.s $f1, 0($sp)\naddi $sp, $sp, 4'''
+                macroTextMips.append(code)
+        elif operand1.type == 'T_ID':
+            if operandType == 'int':
+                code = '''lw $a1, %{}'''.format(operand1.value)
+                macroTextMips.append(code)
+            elif operandType == 'double':
+                code = '''l.s $f1, %{}'''.format(operand1.value)
+                macroTextMips.append(code)
+
+        if operand2.type == 'T_INTLITERAL':
+            code = '''li $a2, {}'''.format(operand2.value)
+            macroTextMips.append(code)
+        elif operand2.type == 'T_DOUBLELITERAL':
+            macroDataMips.append('dbl{} : .float {}'.format(customId[0], operand2.value))
+            code = '''l.s $f2, dbl{}'''.format(customId[0])
+            macroTextMips.append(code)
+            customId[0] += 1
+        elif operand2.type == 'stack':
+            if operandType == 'int':
+                code = '''lw $a2, 0($sp)\naddi $sp, $sp, 4'''
+                macroTextMips.append(code)
+            elif operandType == 'double':
+                code = '''l.s $f2, 0($sp)\naddi $sp, $sp, 4'''
+                macroTextMips.append(code)
+        elif operand2.type == 'T_ID':
+            if operandType == 'int':
+                code = '''lw $a2, %{}'''.format(operand2.value)
+                macroTextMips.append(code)
+            elif operandType == 'double':
+                code = '''l.s $f2, %{}'''.format(operand2.value)
+                macroTextMips.append(code)
+
+    if operandType == 'int':
+        if operator.type == 'T_PLUS':
+            code = '''add $t0, $a1, $a2'''
+            macroTextMips.append(code)
+        elif operator.type == 'T_MINUS':
+            code = '''sub $t0, $a1, $a2'''
+            macroTextMips.append(code)
+        elif operator.type == 'T_MULT':
+            code = '''mul $t0, $a1, $a2'''
+            macroTextMips.append(code)
+        elif operator.type == 'T_DIVIDE':
+            code = '''div $t0, $a1, $a2'''
+            macroTextMips.append(code)
+        elif operator.type == 'T_PERCENTAGE':
+            code = '''rem $t0, $a1, $a2'''
+            macroTextMips.append(code)
+        code = '''addi $sp, $sp, -4\nsw $t0, 0($sp)'''
+        macroTextMips.append(code)
+    elif operandType == 'double':
+        if operator.type == 'T_PLUS':
+            code = '''add.s $f0, $f1, $f2'''
+            macroTextMips.append(code)
+        elif operator.type == 'T_MINUS':
+            code = '''sub.s $f0, $f1, $f2'''
+            macroTextMips.append(code)
+        elif operator.type == 'T_MULT':
+            code = '''mul.s $f0, $f1, $f2'''
+            macroTextMips.append(code)
+        elif operator.type == 'T_DIVIDE':
+            code = '''div.s $f0, $f1, $f2'''
+            macroTextMips.append(code)
+        code = '''addi $sp, $sp, -4\ns.s $f0, 0($sp)'''
+        macroTextMips.append(code)
 
 
 
