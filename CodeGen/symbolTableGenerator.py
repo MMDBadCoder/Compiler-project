@@ -169,6 +169,7 @@ def print_stmt_f(node):
             temp = temp.children[0]
         # print(temp.type)
         if type(temp) is Token:
+            print(temp)
             if temp.type == 'T_ID':
                 foundSymbol = findInSymbolTable(temp.value)
                 if foundSymbol.type == 'int':
@@ -209,10 +210,13 @@ def print_stmt_f(node):
                 if i.value != ',':
                     tempFormals.append(i)
             macroInputs = ''
-            for i in tempFormals:
-                foundSymbol = findInSymbolTable(i.value)
+            for i in range(len(tempFormals)):
+                foundSymbol = findInSymbolTable(tempFormals[i].value)
                 # print(foundSymbol)
-                macroInputs += '{}, '.format(foundSymbol.id)
+                if i == len(tempFormals) - 1:
+                    macroInputs += '{}'.format(foundSymbol.id)
+                else:
+                    macroInputs += '{}, '.format(foundSymbol.id)
             code = '''{} ({})'''.format(temp.children[0], macroInputs)
             codeMips.append(code)
             code = '''li $v0, 1\nlw $a0, 0($sp)\naddi $sp, $sp, 4\nsyscall'''
@@ -259,9 +263,12 @@ def function_decl_f(node):
     if node.children[1].value != 'main':
         formalsString = ''
         getFormals(node.children[3])
-        for i in listOfFunctionFormals:
-            if i.type == 'T_ID':
-                formalsString += '%{}, '.format(i.value)
+        for i in range(len(listOfFunctionFormals)):
+            if listOfFunctionFormals[i].type == 'T_ID':
+                if i == len(listOfFunctionFormals) - 1:
+                    formalsString += '%{}'.format(listOfFunctionFormals[i].value)
+                else:
+                    formalsString += '%{}, '.format(listOfFunctionFormals[i].value)
         macroDataMips.append('.macro {} ('.format(node.children[1].value) + formalsString + ')')
         macroDataMips.append('.data')
         for i in range(len(listOfFunctionFormals)):
